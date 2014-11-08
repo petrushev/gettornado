@@ -5,10 +5,13 @@ from StringIO import StringIO
 from lxml.html import fromstring
 from lxml.etree import XMLSyntaxError
 
-from PyQt4 import QtGui
-from PyQt4.Qt import QHttp, QUrl, QTableWidgetItem, QFileDialog, QString
+from PyQt4.QtCore import Qt as QtCoreQt
+from PyQt4.QtGui import QMainWindow
+from PyQt4.Qt import QHttp, QUrl, QTableWidgetItem, QFileDialog, QString, QApplication,\
+    QCursor
 
-from gettornado.base.main import Ui_BaseMainWindow
+
+from gettornado.base.main import Ui_MainWindow
 
 
 def parseDoc(doc):
@@ -51,13 +54,13 @@ def decodeData(data, headers):
     return data
 
 
-class Ui_MainWindow(Ui_BaseMainWindow, QtGui.QMainWindow):
+class MainWindow(Ui_MainWindow, QMainWindow):
 
     headers = {}
     selectedTorrent = None
 
-    def setupUi(self, BaseMainWindow):
-        Ui_BaseMainWindow.setupUi(self, BaseMainWindow)
+    def setupUi(self):
+        Ui_MainWindow.setupUi(self, self)
 
         self.searchBtn.clicked.connect(self.searchTorrents)
 
@@ -69,7 +72,7 @@ class Ui_MainWindow(Ui_BaseMainWindow, QtGui.QMainWindow):
 
     def searchTorrents(self):
         q = self.qText.text()
-        url = QUrl('http://kickass.to/usearch/'+q + '/')
+        url = QUrl('http://kickass.to/usearch/%s/?field=seeders&sorder=desc' % q)
 
         self.http = QHttp(self)
 
@@ -81,7 +84,10 @@ class Ui_MainWindow(Ui_BaseMainWindow, QtGui.QMainWindow):
         self.http.setHost(url.host(), url.port(80))
         self.http.get(url.path())
 
+        QApplication.setOverrideCursor(QCursor(QtCoreQt.WaitCursor))
+
     def onRequestFinished(self, request_id, has_error):
+
         if has_error:
             print 'error on finished' % request_id
             return
@@ -99,6 +105,8 @@ class Ui_MainWindow(Ui_BaseMainWindow, QtGui.QMainWindow):
         except XMLSyntaxError:
             self.results = []
             return
+
+        QApplication.restoreOverrideCursor()
 
         self.results = parseDoc(doc)
 
@@ -126,6 +134,7 @@ class Ui_MainWindow(Ui_BaseMainWindow, QtGui.QMainWindow):
         url = QUrl(self.selectedTorrent)
         http.setHost(url.host(), url.port(80))
         http.get(url.path())
+        QApplication.setOverrideCursor(QCursor(QtCoreQt.WaitCursor))
 
         headers = {}
 
@@ -140,8 +149,11 @@ class Ui_MainWindow(Ui_BaseMainWindow, QtGui.QMainWindow):
             if len(rqData) == 0:
                 return
 
+            QApplication.restoreOverrideCursor()
+
             # save
-            path = QFileDialog.getSaveFileName(parent=self, caption=QString('Choose location...'))
+            path = QFileDialog.getSaveFileName(parent=self,
+                                               caption=QString('Choose location...'))
             path = str(path.toUtf8())
             if path == '':
                 return

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BaseMainWindow</class>
- <widget class="QMainWindow" name="BaseMainWindow">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Torent Downloader</string>
   </property>
-  <widget class="QWidget" name="BaseCentralwidget">
+  <widget class="QWidget" name="Centralwidget">
    <widget class="QPushButton" name="searchBtn">
     <property name="geometry">
      <rect>
