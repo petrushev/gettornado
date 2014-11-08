@@ -52,3 +52,10 @@ docs/_build/
 
 # PyBuilder
 target/
+
+# eclipse
+.settings
+.pydevproject
+.project
+
+src/gettornado/base/main.py
