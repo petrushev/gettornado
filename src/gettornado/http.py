@@ -18,30 +18,29 @@ def decodeData(data, headers):
     return data
 
 
-class QRequest(QObject):
+class QRequest(QHttp):
 
     finished = QtCore.pyqtSignal(QObject)
 
-    data = None
-    headers = {}
-    history = []
-    statusCode = None
+    def __init__(self, url, params=None, parent=None):
+        QHttp.__init__(self, parent=parent)
 
-    def __init__(self, url, data=None):
-        QObject.__init__(self)
+        self.data = None
+        self.headers = {}
+        self.history = []
+        self.statusCode = None
 
-        self.data = data
+        self.params = params
 
-        if data is not None:
-            url = url + "?" + urlencode(data)
+        if params is not None:
+            url = url + "?" + urlencode(params)
         self.url = url
         self.qUrl = QUrl(url)
 
-        self.rq = QHttp()
-        self.rq.setHost(self.qUrl.host(), self.qUrl.port(80))
+        self.setHost(self.qUrl.host(), self.qUrl.port(80))
 
-        self.rq.responseHeaderReceived.connect(self._onHeaderReceived)
-        self.rq.done.connect(self._onDone)
+        self.responseHeaderReceived.connect(self._onHeaderReceived)
+        self.done.connect(self._onDone)
 
     def _onHeaderReceived(self, headers):
         self.statusCode = headers.statusCode()
@@ -49,15 +48,14 @@ class QRequest(QObject):
                             for k, v in headers.values())
 
     def get(self):
-        self.rq.get(self.qUrl.path())
+        QHttp.get(self, self.qUrl.path())
 
     def _onDone(self, has_error):
         if self.statusCode == 301 or self.statusCode == 302:
             return self._redirected()
 
-        rqData = self.rq.readAll()
-        rqData = decodeData(str(rqData), self.headers)
-        self.data = rqData.decode('utf-8')
+        rqData = self.readAll()
+        self.data = decodeData(str(rqData), self.headers)
 
         self.finished.emit(self)
 
@@ -70,6 +68,6 @@ class QRequest(QObject):
             qNewUrl.setHost(self.qUrl.host())
             qNewUrl.setScheme(self.qUrl.scheme())
 
-        self.rq.setHost(qNewUrl.host(), qNewUrl.port(80))
+        self.setHost(qNewUrl.host(), qNewUrl.port(80))
         self.qUrl = qNewUrl
         self.get()
