@@ -9,6 +9,7 @@ Requirements
 
 - pyqt4
 - lxml
+- cssselect
 
 
 Compiling design
