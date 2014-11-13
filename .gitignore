@@ -59,3 +59,9 @@ target/
 .project
 
 src/gettornado/base/main.py
+
+# kdevelop
+*.kdev4
+
+# qtdeploy installer file
+*.pdy
