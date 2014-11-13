@@ -5,7 +5,8 @@ from lxml.etree import XMLSyntaxError
 
 from PyQt4 import QtCore
 from PyQt4.QtGui import QMainWindow
-from PyQt4.Qt import QTableWidgetItem, QFileDialog, QString, QApplication, QCursor, QMessageBox
+from PyQt4.Qt import QTableWidgetItem, QFileDialog, QString, QApplication, QCursor,\
+    QMessageBox, QDesktopServices
 
 from gettornado.http import QRequest
 from gettornado.base.main import Ui_MainWindow
@@ -111,8 +112,11 @@ class MainWindow(Ui_MainWindow, QMainWindow):
     def onDownloaded(self, request):
         QApplication.restoreOverrideCursor()
 
+        defaultDir = QDesktopServices.storageLocation(QDesktopServices.DesktopLocation)
         path = QFileDialog.getExistingDirectory(parent=self,
-                                                caption=QString('Choose location...'))
+                                                caption=QString('Choose location...'),
+                                                directory=defaultDir)
+
         if path == '':
             return
         path = os.path.join(str(path.toUtf8()),
