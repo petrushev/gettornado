@@ -1,8 +1,9 @@
 import sys
 
-from PyQt4.Qt import QApplication
+from PyQt5.Qt import QApplication
 
 from gettornado.main import MainWindow
+
 
 def main():
     app = QApplication(sys.argv)
